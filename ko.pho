@@ -1,0 +1,71 @@
+<center>
+<?php
+session_start();
+
+try {
+
+$db = new PDO("mysql:host=localhost;dbname=codep126_users",codep126_root,PSO4952y);
+
+}
+
+catch(PDOException $e){
+
+die('Нет соединения с базой данных!');  
+
+}
+
+$db->exec("set names utf8");
+
+$email = $_SESSION['email'];
+
+$password = $_SESSION['password'];
+
+
+$user  = $db->prepare("SELECT * FROM `users` WHERE `email` = ? and `password` = ?");
+
+$user -> execute(array($email, $password));
+
+$user = $user->fetch(PDO :: FETCH_ASSOC);
+
+if(!$user) {
+
+echo 'Пройдите <a href="/">авторизацию</a>!';
+
+exit;
+
+}
+
+if(isset($_POST['ko'])) {
+
+$ko = $_POST['ko'];
+
+if($user['ocras'] != '') {
+
+echo 'Окрас уже выбран! <br> <br> ';
+
+exit;
+
+}
+
+$update_ko = $db->prepare("UPDATE `users` SET `golod` = `golod` - '', `ocras` = ? WHERE `id` = '".$user['id']."'");
+
+$update_ko->execute(array($ko));
+
+header('ocras: ?');
+
+exit;
+
+}
+
+
+
+echo '<br> Имя: '.$user['first_name'].' <br> окрас:	
+<img src="'.$user['ocras'].'".</img> <br> <br> <br>';
+echo '<br><form action="?" method="POST">Выбрать окрас: <br> <select name="ko"> <option disabled>Выберите </option>
+<option value="https://i.postimg.cc/yN3qdw4B/38-20220403113608.png">Белый</option>
+<option value="https://i.postimg.cc/mgMzJxsq/38-20220403113855.png">Черно-Белый</option>
+</select> <input type="submit" value="Перейти"></form>';
+?>
+Окрасы: <p><h3>Белый</h3></p><p><img src = "https://i.postimg.cc/yN3qdw4B/38-20220403113608.png"</img></p>
+<p><h3>Черно-Белый</h3></p><p><img src = "https://i.postimg.cc/mgMzJxsq/38-20220403113855.png"</img></p>
+</center>
